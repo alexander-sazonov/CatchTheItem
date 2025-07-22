@@ -1,0 +1,7 @@
+package io.github.alexander_sazonov;
+
+public class GameResources {
+    public static final String HERO_IMG = "textures/hero_stand.png";
+    public static final String GOOD_ITEM_IMG = "";
+    public static final String BAD_ITEM_IMG = "";
+}
