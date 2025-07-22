@@ -20,7 +20,7 @@ public class GameScreen implements Screen {
         this.game = game;
         hero = new Hero(
             Gdx.graphics.getWidth() / 2,
-            50,
+            100,
             66,
             92,
             GameResources.HERO_IMG,
@@ -36,6 +36,12 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
+        handleInput();
+        game.stepWorld();
+        draw();
+    }
+
+    private void draw() {
         game.camera.update();
         game.batch.setProjectionMatrix(game.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
@@ -71,5 +77,19 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         // Destroy screen's assets here.
+    }
+
+    private void handleInput(){
+        if (Gdx.input.isTouched()){
+            int x = Gdx.input.getX();
+            System.out.printf("touch %d ,hero %d\n", x, hero.getX());
+            if (x <= hero.getX()){
+                hero.moveLeft();
+            }else{
+                hero.moveRight();
+            }
+        }else {
+            hero.stop();
+        }
     }
 }
