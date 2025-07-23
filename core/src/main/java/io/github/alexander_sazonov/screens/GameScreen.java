@@ -5,27 +5,29 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import io.github.alexander_sazonov.GameResources;
+import io.github.alexander_sazonov.GameSettings;
 import io.github.alexander_sazonov.MyGdxGame;
 import io.github.alexander_sazonov.objects.Hero;
+import io.github.alexander_sazonov.objects.Item;
 
 /**
  * First screen of the application. Displayed after the application is created.
  */
 public class GameScreen implements Screen {
     Hero hero;
+    List<Item> items;
     MyGdxGame game;
 
     public GameScreen(MyGdxGame game) {
         this.game = game;
-        hero = new Hero(
-            Gdx.graphics.getWidth() / 2,
-            100,
-            66,
-            92,
-            GameResources.HERO_IMG,
-            game.world
-        );
+        hero = new Hero(Gdx.graphics.getWidth() / 2, 100, 66, 92, GameResources.HERO_IMG, game.world);
+        items = new ArrayList<>();
+        items = addItems();
     }
 
     @Override
@@ -37,6 +39,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
         handleInput();
+        updateItems();
         game.stepWorld();
         draw();
     }
@@ -47,6 +50,10 @@ public class GameScreen implements Screen {
         ScreenUtils.clear(Color.CLEAR);
         game.batch.begin();
         hero.draw(game.batch);
+        for (Item item : items) {
+            item.draw(game.batch);
+            item.move();
+        }
         game.batch.end();
     }
 
@@ -79,17 +86,64 @@ public class GameScreen implements Screen {
         // Destroy screen's assets here.
     }
 
-    private void handleInput(){
-        if (Gdx.input.isTouched()){
+    private void handleInput() {
+        if (Gdx.input.isTouched()) {
             int x = Gdx.input.getX();
-            System.out.printf("touch %d ,hero %d\n", x, hero.getX());
-            if (x <= hero.getX()){
+            if (x <= hero.getX()) {
                 hero.moveLeft();
-            }else{
+            } else {
                 hero.moveRight();
             }
-        }else {
+        } else {
             hero.stop();
+        }
+    }
+
+    private List<Item> addItems() {
+        Random rnd = new Random();
+        for (int i = 0; i < GameSettings.ITEMS_COUNT; i++) {
+            int item_size = 70;
+            int x = item_size / 2 + rnd.nextInt(GameSettings.SCREEN_WIDTH - item_size / 2);
+            int y = GameSettings.SCREEN_HEIGHT + item_size / 2;
+            int typeNumber = rnd.nextInt(2);
+            Item.ItemType itemType;
+            String texturePath;
+            switch (typeNumber) {
+                case 0:
+                    itemType = Item.ItemType.GOOD;
+                    texturePath = GameResources.GOOD_ITEM_IMG;
+                    break;
+                case 1:
+                    itemType = Item.ItemType.BAD;
+                    texturePath = GameResources.BAD_ITEM_IMG;
+                    break;
+                default:
+                    itemType = Item.ItemType.GOOD;
+                    texturePath = GameResources.GOOD_ITEM_IMG;
+            }
+            Item item = new Item(x, y, item_size, item_size, itemType, texturePath, game.world);
+            items.add(item);
+        }
+        return items;
+    }
+
+    private boolean isItemInScreen(Item item) {
+        return item.getY() > -item.height / 2;
+    }
+
+    private void moveItemToStart(Item item) {
+        Random rnd = new Random();
+        int x = item.width / 2 + rnd.nextInt(GameSettings.SCREEN_WIDTH - item.width / 2);
+        int y = GameSettings.SCREEN_HEIGHT + item.height / 2;
+        item.setX(x);
+        item.setY(y);
+    }
+
+    private void updateItems() {
+        for (Item item : items) {
+            if (!isItemInScreen(item)) {
+                moveItemToStart(item);
+            }
         }
     }
 }
