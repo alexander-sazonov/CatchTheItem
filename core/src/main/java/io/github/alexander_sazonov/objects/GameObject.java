@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.github.alexander_sazonov.GameSettings;
 
-public class GameObject {
+public abstract class GameObject {
     private int x;
     private int y;
     public int width;
@@ -40,6 +40,7 @@ public class GameObject {
         fixtureDef.density = 0.1f;
         fixtureDef.friction = 1f;
         Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
         body.setTransform(x * GameSettings.SCALE, y * GameSettings.SCALE, 0);
         return body;
     }
@@ -64,6 +65,6 @@ public class GameObject {
         batch.draw(texture, getX() - (width/2f), getY() - (height/2f), width, height);
     }
 
-
+    public abstract void hit(GameObject gameObject);
 
 }

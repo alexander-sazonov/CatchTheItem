@@ -2,7 +2,9 @@ package io.github.alexander_sazonov;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import io.github.alexander_sazonov.screens.GameScreen;
+import io.github.alexander_sazonov.utils.FontGenerator;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -20,6 +23,7 @@ public class MyGdxGame extends Game {
     public OrthographicCamera camera;
     public SpriteBatch batch;
     float accumulator = 0;
+    public BitmapFont labelFont;
 
     @Override
     public void create() {
@@ -28,6 +32,8 @@ public class MyGdxGame extends Game {
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
         batch = new SpriteBatch();
         world = new World(new Vector2(0, 0), false);
+        world.setContactListener(new HeroItemContactListener());
+        labelFont = FontGenerator.generate(GameResources.FONT_PATH, 32, Color.WHITE);
         setScreen(new GameScreen(this));
     }
 

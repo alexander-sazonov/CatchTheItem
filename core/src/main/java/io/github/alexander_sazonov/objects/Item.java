@@ -16,6 +16,7 @@ public class Item extends GameObject {
 
     public ItemType itemType;
     int speed;
+    private boolean isTouched = false;
 
     public Item(int x, int y, int width, int height, ItemType itemType, String texturePath, World world) {
         super(x, y, width, height, texturePath, world);
@@ -23,9 +24,22 @@ public class Item extends GameObject {
         this.speed = GameSettings.ITEM_MIN_SPEED + (new Random()).nextInt(GameSettings.ITEM_MAX_SPEED);
     }
 
+    @Override
+    public void hit(GameObject gameObject) {
+        if (gameObject instanceof Hero) {
+            isTouched = true;
+        }
+    }
+
     public void move() {
         body.setLinearVelocity(new Vector2(0, -speed));
     }
 
+    public boolean isTouched() {
+        return isTouched;
+    }
 
+    public void setTouched(boolean touched) {
+        isTouched = touched;
+    }
 }

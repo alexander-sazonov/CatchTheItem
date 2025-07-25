@@ -11,4 +11,5 @@ public class GameSettings {
     public static final int ITEM_MIN_SPEED = 5;
     public static final int ITEM_MAX_SPEED = 15;
     public static final int ITEMS_COUNT = 7;
+    public static final int HERO_LIVES = 3;
 }

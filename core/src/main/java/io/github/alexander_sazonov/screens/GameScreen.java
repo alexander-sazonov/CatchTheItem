@@ -14,6 +14,7 @@ import io.github.alexander_sazonov.GameSettings;
 import io.github.alexander_sazonov.MyGdxGame;
 import io.github.alexander_sazonov.objects.Hero;
 import io.github.alexander_sazonov.objects.Item;
+import io.github.alexander_sazonov.ui.Label;
 
 /**
  * First screen of the application. Displayed after the application is created.
@@ -23,11 +24,33 @@ public class GameScreen implements Screen {
     List<Item> items;
     MyGdxGame game;
 
+    Label livesLabel;
+    Label pointsLabel;
+
     public GameScreen(MyGdxGame game) {
         this.game = game;
-        hero = new Hero(Gdx.graphics.getWidth() / 2, 100, 66, 92, GameResources.HERO_IMG, game.world);
+        hero = new Hero(
+            Gdx.graphics.getWidth() / 2,
+            100,
+            66,
+            92,
+            GameResources.HERO_IMG,
+            game.world
+        );
         items = new ArrayList<>();
         items = addItems();
+        livesLabel = new Label(
+            600f,
+            1200f,
+            String.format("LIVES: %d", hero.getLives()),
+            game.labelFont
+        );
+        pointsLabel = new Label(
+            600f,
+            1170f,
+            String.format("POINTS: %d", hero.getPoints()),
+            game.labelFont
+        );
     }
 
     @Override
@@ -39,6 +62,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
         handleInput();
+        updateLabels();
         updateItems();
         game.stepWorld();
         draw();
@@ -49,6 +73,8 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
         game.batch.begin();
+        livesLabel.draw(game.batch);
+        pointsLabel.draw(game.batch);
         hero.draw(game.batch);
         for (Item item : items) {
             item.draw(game.batch);
@@ -133,6 +159,7 @@ public class GameScreen implements Screen {
 
     private void moveItemToStart(Item item) {
         Random rnd = new Random();
+        item.setTouched(false);
         int x = item.width / 2 + rnd.nextInt(GameSettings.SCREEN_WIDTH - item.width / 2);
         int y = GameSettings.SCREEN_HEIGHT + item.height / 2;
         item.setX(x);
@@ -141,9 +168,14 @@ public class GameScreen implements Screen {
 
     private void updateItems() {
         for (Item item : items) {
-            if (!isItemInScreen(item)) {
+            if (!isItemInScreen(item) || item.isTouched()) {
                 moveItemToStart(item);
             }
         }
+    }
+
+    private void updateLabels(){
+        livesLabel.setText(String.format("LIVES: %d", hero.getLives()));
+        pointsLabel.setText(String.format("POINTS: %d", hero.getPoints()));
     }
 }
