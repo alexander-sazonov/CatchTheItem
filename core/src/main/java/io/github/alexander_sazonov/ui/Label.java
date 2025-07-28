@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Label extends View{
+public class Label extends View {
 
     private String text;
     private BitmapFont bitmapFont;
+
     public Label(float x, float y, BitmapFont bitmapFont) {
         super(x, y);
         this.bitmapFont = bitmapFont;
@@ -18,8 +19,11 @@ public class Label extends View{
         this.text = text;
         this.bitmapFont = bitmapFont;
         GlyphLayout glyphLayout = new GlyphLayout(this.bitmapFont, this.text);
+        width = (int) glyphLayout.width;
+        height = (int) glyphLayout.height;
 
     }
+
 
     public String getText() {
         return text;
@@ -27,7 +31,7 @@ public class Label extends View{
 
     public void setText(String text) {
         this.text = text;
-        GlyphLayout glyphLayout = new GlyphLayout(bitmapFont,this.text);
+        GlyphLayout glyphLayout = new GlyphLayout(bitmapFont, this.text);
         width = (int) glyphLayout.width;
         height = (int) glyphLayout.height;
     }

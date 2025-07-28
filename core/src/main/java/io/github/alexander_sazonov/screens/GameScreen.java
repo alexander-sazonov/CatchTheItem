@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Random;
 
 import io.github.alexander_sazonov.GameResources;
+import io.github.alexander_sazonov.GameSession;
 import io.github.alexander_sazonov.GameSettings;
 import io.github.alexander_sazonov.MyGdxGame;
 import io.github.alexander_sazonov.objects.Hero;
 import io.github.alexander_sazonov.objects.Item;
+import io.github.alexander_sazonov.ui.Button;
 import io.github.alexander_sazonov.ui.Label;
 
 /**
@@ -23,9 +25,12 @@ public class GameScreen implements Screen {
     Hero hero;
     List<Item> items;
     MyGdxGame game;
-
     Label livesLabel;
     Label pointsLabel;
+    Label timerLabel;
+    Label gameOverLabel;
+    Button restartButton;
+    GameSession gameSession;
 
     public GameScreen(MyGdxGame game) {
         this.game = game;
@@ -37,6 +42,7 @@ public class GameScreen implements Screen {
             GameResources.HERO_IMG,
             game.world
         );
+        gameSession = new GameSession(hero);
         items = new ArrayList<>();
         items = addItems();
         livesLabel = new Label(
@@ -51,6 +57,19 @@ public class GameScreen implements Screen {
             String.format("POINTS: %d", hero.getPoints()),
             game.labelFont
         );
+        timerLabel = new Label(
+            50,
+            1200,
+            String.format("TIME: %d", gameSession.getGameTime()),
+            game.labelFont
+        );
+        gameOverLabel = new Label(
+            Gdx.graphics.getWidth() / 2 - 210,
+            Gdx.graphics.getHeight() / 2 - 50,
+            game.gameOverFont
+        );
+        restartButton = new Button(Gdx.graphics.getWidth() / 2 - 95,
+            Gdx.graphics.getHeight() / 2 - 122, 190, 45, game.buttonFont, "Restart");
     }
 
     @Override
@@ -64,6 +83,7 @@ public class GameScreen implements Screen {
         handleInput();
         updateLabels();
         updateItems();
+        gameSession.updateSession();
         game.stepWorld();
         draw();
     }
@@ -73,13 +93,25 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
         game.batch.begin();
-        livesLabel.draw(game.batch);
-        pointsLabel.draw(game.batch);
-        hero.draw(game.batch);
-        for (Item item : items) {
-            item.draw(game.batch);
-            item.move();
+        switch (gameSession.gameState) {
+            case PLAYING:
+                livesLabel.draw(game.batch);
+                pointsLabel.draw(game.batch);
+                timerLabel.draw(game.batch);
+                hero.draw(game.batch);
+                for (Item item : items) {
+                    item.draw(game.batch);
+                    item.move();
+                }
+                break;
+            case ENDED:
+                ScreenUtils.clear(Color.CLEAR);
+                gameOverLabel.setText(String.format("Game Over\nPoints: %d", hero.getPoints()));
+                gameOverLabel.draw(game.batch);
+                restartButton.draw(game.batch);
+                break;
         }
+
         game.batch.end();
     }
 
@@ -115,11 +147,16 @@ public class GameScreen implements Screen {
     private void handleInput() {
         if (Gdx.input.isTouched()) {
             int x = Gdx.input.getX();
-            if (x <= hero.getX()) {
-                hero.moveLeft();
-            } else {
-                hero.moveRight();
+            int y = Gdx.input.getY();
+            switch (gameSession.gameState) {
+                case PLAYING:
+                    if (x <= hero.getX()) {
+                        hero.moveLeft();
+                    } else {
+                        hero.moveRight();
+                    }
             }
+
         } else {
             hero.stop();
         }
@@ -167,15 +204,24 @@ public class GameScreen implements Screen {
     }
 
     private void updateItems() {
-        for (Item item : items) {
-            if (!isItemInScreen(item) || item.isTouched()) {
-                moveItemToStart(item);
-            }
+        switch (gameSession.gameState) {
+            case PLAYING:
+                for (Item item : items) {
+                    if (!isItemInScreen(item) || item.isTouched()) {
+                        moveItemToStart(item);
+                    }
+                }
+                break;
+            case ENDED:
+                items.clear();
+                break;
         }
+
     }
 
-    private void updateLabels(){
+    private void updateLabels() {
         livesLabel.setText(String.format("LIVES: %d", hero.getLives()));
         pointsLabel.setText(String.format("POINTS: %d", hero.getPoints()));
+        timerLabel.setText(String.format("TIME: %d", gameSession.getGameTime()));
     }
 }

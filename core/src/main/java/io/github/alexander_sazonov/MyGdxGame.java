@@ -24,6 +24,8 @@ public class MyGdxGame extends Game {
     public SpriteBatch batch;
     float accumulator = 0;
     public BitmapFont labelFont;
+    public BitmapFont gameOverFont;
+    public BitmapFont buttonFont;
 
     @Override
     public void create() {
@@ -34,6 +36,8 @@ public class MyGdxGame extends Game {
         world = new World(new Vector2(0, 0), false);
         world.setContactListener(new HeroItemContactListener());
         labelFont = FontGenerator.generate(GameResources.FONT_PATH, 32, Color.WHITE);
+        gameOverFont = FontGenerator.generate(GameResources.FONT_PATH, 72, Color.WHITE);
+        buttonFont = FontGenerator.generate(GameResources.FONT_PATH, 32, Color.BLACK);
         setScreen(new GameScreen(this));
     }
 

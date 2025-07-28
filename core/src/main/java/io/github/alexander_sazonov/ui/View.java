@@ -9,6 +9,7 @@ public abstract class View implements Disposable {
     float width;
     float height;
 
+
     public View(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
@@ -21,5 +22,10 @@ public abstract class View implements Disposable {
         this.y = y;
     }
 
+    public boolean isPressed(float pressX, float pressY){
+        return (pressX >= x && pressX <= x + width && pressY >= y && pressY <= y + height);
+    }
+
     public abstract void draw(SpriteBatch batch);
+
 }
