@@ -3,6 +3,7 @@ package io.github.alexander_sazonov.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class GameScreen implements Screen {
     Label livesLabel;
     Label pointsLabel;
     Label timerLabel;
-    Label gameOverLabel;
-    Button restartButton;
+//    Label gameOverLabel;
+//    Button restartButton;
     GameSession gameSession;
 
     public GameScreen(MyGdxGame game) {
@@ -44,7 +45,6 @@ public class GameScreen implements Screen {
         );
         gameSession = new GameSession(hero);
         items = new ArrayList<>();
-        items = addItems();
         livesLabel = new Label(
             600f,
             1200f,
@@ -63,23 +63,29 @@ public class GameScreen implements Screen {
             String.format("TIME: %d", gameSession.getGameTime()),
             game.labelFont
         );
-        gameOverLabel = new Label(
-            Gdx.graphics.getWidth() / 2 - 210,
-            Gdx.graphics.getHeight() / 2 - 50,
-            game.gameOverFont
-        );
-        restartButton = new Button(Gdx.graphics.getWidth() / 2 - 95,
-            Gdx.graphics.getHeight() / 2 - 122, 190, 45, game.buttonFont, "Restart");
+//        gameOverLabel = new Label(
+//            Gdx.graphics.getWidth() / 2 - 210,
+//            Gdx.graphics.getHeight() / 2 - 50,
+//            game.gameOverFont
+//        );
+//        restartButton = new Button((float)(Gdx.graphics.getWidth() / 2) - 95,
+//            (float)(Gdx.graphics.getHeight() / 2) - 122, 190, 45, game.buttonFont, "Restart");
     }
 
     @Override
     public void show() {
         // Prepare your screen here.
+        gameSession.restartGame();
+        items.clear();
+        items = addItems();
     }
 
     @Override
     public void render(float delta) {
         // Draw your screen here. "delta" is the time since last render in seconds.
+        if (gameSession.gameState == GameSession.GameState.ENDED){
+            game.setScreen(game.gameOverScreen);
+        }
         handleInput();
         updateLabels();
         updateItems();
@@ -93,8 +99,8 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(game.camera.combined);
         ScreenUtils.clear(Color.CLEAR);
         game.batch.begin();
-        switch (gameSession.gameState) {
-            case PLAYING:
+//        switch (gameSession.gameState) {
+//            case PLAYING:
                 livesLabel.draw(game.batch);
                 pointsLabel.draw(game.batch);
                 timerLabel.draw(game.batch);
@@ -103,14 +109,14 @@ public class GameScreen implements Screen {
                     item.draw(game.batch);
                     item.move();
                 }
-                break;
-            case ENDED:
-                ScreenUtils.clear(Color.CLEAR);
-                gameOverLabel.setText(String.format("Game Over\nPoints: %d", hero.getPoints()));
-                gameOverLabel.draw(game.batch);
-                restartButton.draw(game.batch);
-                break;
-        }
+//                break;
+//            case ENDED:
+//              ScreenUtils.clear(Color.CLEAR);
+//                gameOverLabel.setText(String.format("Game Over\nPoints: %d", hero.getPoints()));
+//                gameOverLabel.draw(game.batch);
+//                restartButton.draw(game.batch);
+//                break;
+//        }
 
         game.batch.end();
     }
@@ -146,16 +152,25 @@ public class GameScreen implements Screen {
 
     private void handleInput() {
         if (Gdx.input.isTouched()) {
-            int x = Gdx.input.getX();
-            int y = Gdx.input.getY();
-            switch (gameSession.gameState) {
-                case PLAYING:
+            Vector3 touch = game.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+            float x = touch.x;
+            float y = touch.y;
+//            switch (gameSession.gameState) {
+//                case PLAYING:
                     if (x <= hero.getX()) {
                         hero.moveLeft();
                     } else {
                         hero.moveRight();
                     }
-            }
+//                    break;
+//                case ENDED:
+//                    if (restartButton.isPressed(x,y)){
+//                        System.out.println("Restart");
+//                        gameSession.restartGame();
+////                        items = addItems();
+//                    }
+//                    break;
+//            }
 
         } else {
             hero.stop();
@@ -204,18 +219,18 @@ public class GameScreen implements Screen {
     }
 
     private void updateItems() {
-        switch (gameSession.gameState) {
-            case PLAYING:
+//        switch (gameSession.gameState) {
+//            case PLAYING:
                 for (Item item : items) {
                     if (!isItemInScreen(item) || item.isTouched()) {
                         moveItemToStart(item);
                     }
                 }
-                break;
-            case ENDED:
-                items.clear();
-                break;
-        }
+//                break;
+//            case ENDED:
+//                items.clear();
+//                break;
+//        }
 
     }
 

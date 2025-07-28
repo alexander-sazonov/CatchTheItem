@@ -57,6 +57,10 @@ public class Hero extends GameObject {
         return points;
     }
 
+    public void setPoints(int points){
+        this.points = points;
+    }
+
     public boolean isAlive() {
         return lives > 0;
     }

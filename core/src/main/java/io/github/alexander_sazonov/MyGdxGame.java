@@ -2,6 +2,7 @@ package io.github.alexander_sazonov;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import io.github.alexander_sazonov.screens.GameOverScreen;
 import io.github.alexander_sazonov.screens.GameScreen;
 import io.github.alexander_sazonov.utils.FontGenerator;
 
@@ -26,19 +28,23 @@ public class MyGdxGame extends Game {
     public BitmapFont labelFont;
     public BitmapFont gameOverFont;
     public BitmapFont buttonFont;
+    public GameScreen gameScreen;
+    public GameOverScreen gameOverScreen;
 
     @Override
     public void create() {
         Box2D.init();
+        world = new World(new Vector2(0, 0), false);
+        world.setContactListener(new HeroItemContactListener());
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT);
         batch = new SpriteBatch();
-        world = new World(new Vector2(0, 0), false);
-        world.setContactListener(new HeroItemContactListener());
         labelFont = FontGenerator.generate(GameResources.FONT_PATH, 32, Color.WHITE);
         gameOverFont = FontGenerator.generate(GameResources.FONT_PATH, 72, Color.WHITE);
         buttonFont = FontGenerator.generate(GameResources.FONT_PATH, 32, Color.BLACK);
-        setScreen(new GameScreen(this));
+        gameScreen = new GameScreen(this);
+        gameOverScreen = new GameOverScreen(this);
+        setScreen(gameScreen);
     }
 
     @Override

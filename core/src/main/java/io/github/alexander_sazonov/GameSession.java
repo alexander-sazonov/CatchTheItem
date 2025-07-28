@@ -42,5 +42,11 @@ public class GameSession {
                 }
         }
     }
+    public void restartGame(){
+        hero.setLives(GameSettings.HERO_LIVES);
+        hero.setPoints(0);
+        startTime = TimeUtils.millis();
+        gameState = GameState.PLAYING;
+    }
 
 }
